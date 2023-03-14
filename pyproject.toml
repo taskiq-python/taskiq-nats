@@ -18,6 +18,8 @@ pre-commit = "^3.1.1"
 mypy = "^1.1.1"
 flake8 = "^4.0.0"
 wemake-python-styleguide = "^0.17.0"
+autoflake = "^1.4"
+yesqa = "^1.4.0"
 
 [build-system]
 requires = ["poetry-core"]

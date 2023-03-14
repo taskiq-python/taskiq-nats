@@ -1,13 +1,17 @@
+from logging import getLogger
 from typing import Any, AsyncGenerator, Callable, Optional, TypeVar, Union
-from taskiq import AsyncBroker, AsyncResultBackend, BrokerMessage
 
 from nats.aio.client import Client
+from taskiq import AsyncBroker, AsyncResultBackend, BrokerMessage
 
-_T = TypeVar("_T")
+_T = TypeVar("_T")  # noqa: WPS111 (Too short)
+
+
+logger = getLogger("taskiq_nats")
 
 
 class NatsBroker(AsyncBroker):
-    def __init__(
+    def __init__(  # noqa: WPS211 (too many args)
         self,
         servers: Union[str, list[str]],
         subject: str = "tasiq_tasks",
@@ -35,13 +39,12 @@ class NatsBroker(AsyncBroker):
         )
 
     async def listen(self) -> AsyncGenerator[BrokerMessage, None]:
-        subscribe = await self.client.subscribe(self.subject, queue=self.queue)
+        subscribe = await self.client.subscribe(self.subject, queue=self.queue or "")
         async for message in subscribe.messages:
             try:
-                message = BrokerMessage.parse_raw(message.data)
-                yield message
+                yield BrokerMessage.parse_raw(message.data)
             except ValueError:
-                continue
+                logger.warning(f"Cannot parse message: {message.data.decode('utf-8')}")
 
     async def shutdown(self) -> None:
         await self.client.close()
