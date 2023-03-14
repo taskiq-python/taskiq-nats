@@ -11,6 +11,20 @@ logger = getLogger("taskiq_nats")
 
 
 class NatsBroker(AsyncBroker):
+    """
+    NATS broker for taskiq.
+
+    By default this broker works
+    broadcasting message to all connected workers.
+
+    If you want to make it work as queue,
+    you need to supply name of the queue in
+    queue argument.
+
+    Docs about queue:
+    https://docs.nats.io/nats-concepts/core-nats/queue
+    """
+
     def __init__(  # noqa: WPS211 (too many args)
         self,
         servers: Union[str, list[str]],
@@ -28,10 +42,20 @@ class NatsBroker(AsyncBroker):
         self.subject = subject
 
     async def startup(self) -> None:
+        """
+        Startup event handler.
+
+        It simply connects to NATS cluster.
+        """
         await super().startup()
         await self.client.connect(self.servers, **self.connection_kwargs)
 
     async def kick(self, message: BrokerMessage) -> None:
+        """
+        Send a message using NATS.
+
+        :param message: message to send.
+        """
         await self.client.publish(
             self.subject,
             payload=message.json().encode(),
@@ -39,12 +63,19 @@ class NatsBroker(AsyncBroker):
         )
 
     async def listen(self) -> AsyncGenerator[BrokerMessage, None]:
+        """
+        Start listen to new messages.
+
+        :yield: incoming messages.
+        """
         subscribe = await self.client.subscribe(self.subject, queue=self.queue or "")
         async for message in subscribe.messages:
             try:
                 yield BrokerMessage.parse_raw(message.data)
             except ValueError:
-                logger.warning(f"Cannot parse message: {message.data.decode('utf-8')}")
+                data = message.data.decode("utf-8")
+                logger.warning(f"Cannot parse message: {data}")
 
     async def shutdown(self) -> None:
+        """Close connections to NATS."""
         await self.client.close()
