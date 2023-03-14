@@ -54,7 +54,7 @@ jobs:
           --health-interval=5s
           --health-timeout=5s
           --health-retries=30
-          --entrypoint="docker-entrypoint.sh -m 8222"
+          --entrypoint="nats-server --config /etc/nats/nats-server.conf -m 8222"
         ports:
           - 4222:4222
     strategy:
