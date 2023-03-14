@@ -20,6 +20,7 @@ flake8 = "^4.0.0"
 wemake-python-styleguide = "^0.17.0"
 autoflake = "^1.4"
 yesqa = "^1.4.0"
+pytest = "^7.2.2"
 
 [build-system]
 requires = ["poetry-core"]
