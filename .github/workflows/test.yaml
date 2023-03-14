@@ -46,17 +46,6 @@ jobs:
       - name: Run mypy check
         run: poetry run mypy .
   pytest:
-    services:
-      redis:
-        image: nats:2.9.15-alpine
-        options: >-
-          --health-cmd="wget http://localhost:8222/healthz -q -O - | xargs | grep ok || exit 1"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=30
-          --entrypoint="nats-server --config /etc/nats/nats-server.conf -m 8222"
-        ports:
-          - 4222:4222
     strategy:
       matrix:
         py_version: ["3.7", "3.8", "3.9", "3.10"]
@@ -75,5 +64,7 @@ jobs:
         run: poetry install
         env:
           POETRY_VIRTUALENVS_CREATE: false
+      - name: docker compose up
+        run: docker-compose up -d --wait
       - name: Run pytest check
         run: poetry run pytest -vv -n auto --cov="taskiq_nats" .
