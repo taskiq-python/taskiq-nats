@@ -1,5 +1,6 @@
 import os
 import uuid
+from typing import List
 
 import pytest
 
@@ -26,7 +27,7 @@ def nats_subject() -> str:
 
 
 @pytest.fixture
-def nats_urls() -> list[str]:
+def nats_urls() -> List[str]:
     """
     List of nats urls.
 

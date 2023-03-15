@@ -24,6 +24,23 @@ pytest = "^7.2.2"
 pytest-xdist = "^3.2.1"
 anyio = "^3.6.2"
 
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+allow_subclassing_any = true
+allow_untyped_calls = true
+pretty = true
+show_error_codes = true
+implicit_reexport = true
+allow_untyped_decorators = true
+warn_return_any = false
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
