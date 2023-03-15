@@ -64,6 +64,9 @@ jobs:
         run: poetry install
         env:
           POETRY_VIRTUALENVS_CREATE: false
+      - uses: KengoTODA/actions-setup-docker-compose@v1
+        with:
+          version: '2.16.0'
       - name: docker compose up
         run: docker-compose up -d --wait
       - name: Run pytest check
