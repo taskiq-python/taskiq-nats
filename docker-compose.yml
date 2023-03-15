@@ -1,0 +1,24 @@
+version: '3.7'
+
+# This docker compose is used for testing.
+# It contains only services required for pytest to run
+# successfully.
+services:
+  nats:
+    image: nats:2.9.15-alpine
+    command:
+      - "-m"
+      - "8222"
+      - "--debug"
+    healthcheck:
+      test:
+        - "CMD"
+        - "sh"
+        - "-c"
+        - "wget http://localhost:8222/healthz -q -O - | xargs | grep ok || exit 1"
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports:
+      - 8222:8222
+      - 4222:4222
