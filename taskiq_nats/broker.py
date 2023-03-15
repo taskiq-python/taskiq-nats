@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Any, AsyncGenerator, Callable, Optional, TypeVar, Union
+from typing import Any, AsyncGenerator, Callable, List, Optional, TypeVar, Union
 
 from nats.aio.client import Client
 from taskiq import AsyncBroker, AsyncResultBackend, BrokerMessage
@@ -27,7 +27,7 @@ class NatsBroker(AsyncBroker):
 
     def __init__(  # noqa: WPS211 (too many args)
         self,
-        servers: Union[str, list[str]],
+        servers: Union[str, List[str]],
         subject: str = "tasiq_tasks",
         queue: Optional[str] = None,
         result_backend: "Optional[AsyncResultBackend[_T]]" = None,
