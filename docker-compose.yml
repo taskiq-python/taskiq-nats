@@ -1,5 +1,8 @@
 version: '3.7'
 
+# This docker compose is used for testing.
+# It contains only services required for pytest to run
+# successfully.
 services:
   nats:
     image: nats:2.9.15-alpine

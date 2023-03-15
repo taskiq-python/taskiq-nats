@@ -1,0 +1,55 @@
+import asyncio
+import uuid
+
+import pytest
+from taskiq import BrokerMessage
+
+from taskiq_nats import NatsBroker
+
+
+async def read_message(broker: NatsBroker) -> BrokerMessage:  # type: ignore
+    """
+    Read signle message from the broker's listen method.
+
+    :param broker: current broker.
+    :return: firs message.
+    """
+    async for message in broker.listen():  # noqa: WPS328
+        return message
+
+
+@pytest.mark.anyio
+async def test_success_broadcast(nats_urls: list[str], nats_subject: str) -> None:
+    """Test that broadcasting works."""
+    broker = NatsBroker(servers=nats_urls, subject=nats_subject)
+    await broker.startup()
+    tasks = []
+    for _ in range(10):
+        tasks.append(asyncio.create_task(read_message(broker)))
+
+    sent_message = BrokerMessage(
+        task_id=uuid.uuid4().hex,
+        task_name="meme",
+        message="some",
+        labels={},
+    )
+    asyncio.create_task(broker.kick(sent_message))
+    for received_message in await asyncio.gather(*tasks):
+        assert received_message == sent_message
+
+
+@pytest.mark.anyio
+async def test_success_queued(nats_urls: list[str], nats_subject: str) -> None:
+    """Testing that queue works."""
+    broker = NatsBroker(servers=nats_urls, subject=nats_subject, queue=uuid.uuid4().hex)
+    await broker.startup()
+    reading_task = asyncio.create_task(read_message(broker))
+
+    sent_message = BrokerMessage(
+        task_id=uuid.uuid4().hex,
+        task_name="meme",
+        message="some",
+        labels={},
+    )
+    asyncio.create_task(broker.kick(sent_message))
+    assert await reading_task == sent_message
