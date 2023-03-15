@@ -1,10 +1,22 @@
 [tool.poetry]
 name = "taskiq-nats"
 version = "0.1.0"
-description = ""
-authors = ["Pavel Kirilin <win10@list.ru>"]
+description = "NATS integration for taskiq"
+authors = ["taskiq-team <taskiq@norely.com>"]
 readme = "README.md"
 packages = [{ include = "taskiq_nats" }]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+homepage = "https://github.com/taskiq-python/taskiq-nats"
+repository = "https://github.com/taskiq-python/taskiq-nats"
+keywords = ["taskiq", "tasks", "distributed", "async", "nats", "result_backend"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
