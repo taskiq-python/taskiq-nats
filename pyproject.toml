@@ -7,14 +7,14 @@ readme = "README.md"
 packages = [{ include = "taskiq_nats" }]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7"
 nats-py = "^2.2.0"
 taskiq = "^0.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
-pre-commit = "^3.1.1"
+pre-commit = "^2.20.0"
 mypy = "^1.1.1"
 flake8 = "^4.0.0"
 wemake-python-styleguide = "^0.17.0"
