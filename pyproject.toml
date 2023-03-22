@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "taskiq-nats"
-version = "0.1.0"
+version = "0.1.1"
 description = "NATS integration for taskiq"
 authors = ["taskiq-team <taskiq@norely.com>"]
 readme = "README.md"
