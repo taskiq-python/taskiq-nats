@@ -79,3 +79,4 @@ class NatsBroker(AsyncBroker):
     async def shutdown(self) -> None:
         """Close connections to NATS."""
         await self.client.close()
+        await super().shutdown()
