@@ -21,7 +21,7 @@ keywords = ["taskiq", "tasks", "distributed", "async", "nats", "result_backend"]
 [tool.poetry.dependencies]
 python = "^3.7"
 nats-py = "^2.2.0"
-taskiq = "^0.2.0"
+taskiq = "^0"
 
 
 [tool.poetry.group.dev.dependencies]
