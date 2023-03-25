@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "taskiq-nats"
-version = "0.1.1"
+version = "0.1.2"
 description = "NATS integration for taskiq"
 authors = ["taskiq-team <taskiq@norely.com>"]
 readme = "README.md"
@@ -21,7 +21,7 @@ keywords = ["taskiq", "tasks", "distributed", "async", "nats", "result_backend"]
 [tool.poetry.dependencies]
 python = "^3.7"
 nats-py = "^2.2.0"
-taskiq = "^0.2.0"
+taskiq = "^0"
 
 
 [tool.poetry.group.dev.dependencies]
