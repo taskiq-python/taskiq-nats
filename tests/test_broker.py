@@ -26,7 +26,7 @@ async def test_success_broadcast(nats_urls: List[str], nats_subject: str) -> Non
     await broker.startup()
     tasks = []
     for _ in range(10):
-        tasks.append(asyncio.create_task(read_message(broker)))
+        tasks.append(asyncio.wait_for(asyncio.create_task(read_message(broker)), 1))
 
     sent_message = BrokerMessage(
         task_id=uuid.uuid4().hex,
@@ -44,7 +44,9 @@ async def test_success_queued(nats_urls: List[str], nats_subject: str) -> None:
     """Testing that queue works."""
     broker = NatsBroker(servers=nats_urls, subject=nats_subject, queue=uuid.uuid4().hex)
     await broker.startup()
-    reading_task = asyncio.create_task(read_message(broker))
+    reading_task = asyncio.create_task(
+        asyncio.wait_for(read_message(broker), timeout=1),
+    )
 
     sent_message = BrokerMessage(
         task_id=uuid.uuid4().hex,
