@@ -8,7 +8,7 @@ from taskiq import BrokerMessage
 from taskiq_nats import NatsBroker
 
 
-async def read_message(broker: NatsBroker) -> BrokerMessage:  # type: ignore
+async def read_message(broker: NatsBroker) -> bytes:  # type: ignore
     """
     Read signle message from the broker's listen method.
 
@@ -31,12 +31,12 @@ async def test_success_broadcast(nats_urls: List[str], nats_subject: str) -> Non
     sent_message = BrokerMessage(
         task_id=uuid.uuid4().hex,
         task_name="meme",
-        message="some",
+        message=b"some",
         labels={},
     )
     asyncio.create_task(broker.kick(sent_message))
     for received_message in await asyncio.gather(*tasks):
-        assert received_message == sent_message
+        assert received_message == sent_message.message
 
 
 @pytest.mark.anyio
@@ -49,8 +49,8 @@ async def test_success_queued(nats_urls: List[str], nats_subject: str) -> None:
     sent_message = BrokerMessage(
         task_id=uuid.uuid4().hex,
         task_name="meme",
-        message="some",
+        message=b"some",
         labels={},
     )
     asyncio.create_task(broker.kick(sent_message))
-    assert await reading_task == sent_message
+    assert await reading_task == sent_message.message
