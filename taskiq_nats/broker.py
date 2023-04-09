@@ -58,11 +58,11 @@ class NatsBroker(AsyncBroker):
         """
         await self.client.publish(
             self.subject,
-            payload=message.json().encode(),
+            payload=message.message,
             headers=message.labels,
         )
 
-    async def listen(self) -> AsyncGenerator[BrokerMessage, None]:
+    async def listen(self) -> AsyncGenerator[bytes, None]:
         """
         Start listen to new messages.
 
@@ -70,11 +70,7 @@ class NatsBroker(AsyncBroker):
         """
         subscribe = await self.client.subscribe(self.subject, queue=self.queue or "")
         async for message in subscribe.messages:
-            try:
-                yield BrokerMessage.parse_raw(message.data)
-            except ValueError:
-                data = message.data.decode("utf-8")
-                logger.warning(f"Cannot parse message: {data}")
+            yield message.data
 
     async def shutdown(self) -> None:
         """Close connections to NATS."""
