@@ -26,7 +26,7 @@ async def test_success_broadcast(nats_urls: List[str], nats_subject: str) -> Non
     await broker.startup()
     tasks = []
     for _ in range(10):
-        tasks.append(asyncio.wait_for(asyncio.create_task(read_message(broker)), 1))
+        tasks.append(asyncio.create_task(read_message(broker)))
 
     sent_message = BrokerMessage(
         task_id=uuid.uuid4().hex,
@@ -34,8 +34,10 @@ async def test_success_broadcast(nats_urls: List[str], nats_subject: str) -> Non
         message=b"some",
         labels={},
     )
+
     asyncio.create_task(broker.kick(sent_message))
-    for received_message in await asyncio.gather(*tasks):
+
+    for received_message in await asyncio.wait_for(asyncio.gather(*tasks), timeout=1):
         assert received_message == sent_message.message
 
 
@@ -45,7 +47,7 @@ async def test_success_queued(nats_urls: List[str], nats_subject: str) -> None:
     broker = NatsBroker(servers=nats_urls, subject=nats_subject, queue=uuid.uuid4().hex)
     await broker.startup()
     reading_task = asyncio.create_task(
-        asyncio.wait_for(read_message(broker), timeout=1),
+        read_message(broker),
     )
 
     sent_message = BrokerMessage(
@@ -55,4 +57,4 @@ async def test_success_queued(nats_urls: List[str], nats_subject: str) -> None:
         labels={},
     )
     asyncio.create_task(broker.kick(sent_message))
-    assert await reading_task == sent_message.message
+    assert await asyncio.wait_for(reading_task, timeout=1) == sent_message.message
