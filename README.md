@@ -7,7 +7,7 @@ Taskiq-nats is a plugin for taskiq that adds NATS broker.
 To use this project you must have installed core taskiq library:
 
 ```bash
-pip install taskiq taskiq-redis
+pip install taskiq taskiq-nats
 ```
 
 ## Usage
