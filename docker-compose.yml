@@ -10,6 +10,7 @@ services:
       - "-m"
       - "8222"
       - "--debug"
+      - "--jetstream"
     healthcheck:
       test:
         - "CMD"
