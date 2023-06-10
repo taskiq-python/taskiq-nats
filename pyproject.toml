@@ -19,7 +19,7 @@ repository = "https://github.com/taskiq-python/taskiq-nats"
 keywords = ["taskiq", "tasks", "distributed", "async", "nats", "result_backend"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8.1"
 nats-py = "^2.2.0"
 taskiq = "^0"
 
@@ -28,14 +28,14 @@ taskiq = "^0"
 black = "^23.1.0"
 pre-commit = "^2.20.0"
 mypy = "^1.1.1"
-flake8 = "^4.0.0"
-wemake-python-styleguide = "^0.17.0"
+flake8 = "^6"
 autoflake = "^1.4"
 yesqa = "^1.4.0"
 pytest = "^7.2.2"
 pytest-xdist = "^3.2.1"
 anyio = "^3.6.2"
 pytest-cov = "^4.0.0"
+wemake-python-styleguide = "^0.18.0"
 
 
 [tool.mypy]
