@@ -22,7 +22,6 @@ keywords = ["taskiq", "tasks", "distributed", "async", "nats", "result_backend"]
 python = "^3.8.1"
 nats-py = "^2.2.0"
 taskiq = "^0"
-wemake-python-styleguide = "^0.18.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -36,6 +35,7 @@ pytest = "^7.2.2"
 pytest-xdist = "^3.2.1"
 anyio = "^3.6.2"
 pytest-cov = "^4.0.0"
+wemake-python-styleguide = "^0.18.0"
 
 
 [tool.mypy]
