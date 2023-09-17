@@ -6,7 +6,6 @@ from taskiq import AsyncBroker, AsyncResultBackend, BrokerMessage
 
 _T = TypeVar("_T")  # noqa: WPS111 (Too short)
 
-
 logger = getLogger("taskiq_nats")
 
 
@@ -14,7 +13,7 @@ class NatsBroker(AsyncBroker):
     """
     NATS broker for taskiq.
 
-    By default this broker works
+    By default, this broker works
     broadcasting message to all connected workers.
 
     If you want to make it work as queue,
@@ -26,13 +25,13 @@ class NatsBroker(AsyncBroker):
     """
 
     def __init__(  # noqa: WPS211 (too many args)
-        self,
-        servers: Union[str, List[str]],
-        subject: str = "tasiq_tasks",
-        queue: Optional[str] = None,
-        result_backend: "Optional[AsyncResultBackend[_T]]" = None,
-        task_id_generator: Optional[Callable[[], str]] = None,
-        **connection_kwargs: Any,
+            self,
+            servers: Union[str, List[str]],
+            subject: str = "taskiq_nats",
+            queue: Optional[str] = None,
+            result_backend: "Optional[AsyncResultBackend[_T]]" = None,
+            task_id_generator: Optional[Callable[[], str]] = None,
+            **connection_kwargs: Any,
     ) -> None:
         super().__init__(result_backend, task_id_generator)
         self.servers = servers
