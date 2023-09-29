@@ -1,6 +1,7 @@
 # Taskiq NATS
 
 Taskiq-nats is a plugin for taskiq that adds NATS broker.
+This package has support for NATS JetStream.
 
 ## Installation
 
@@ -16,7 +17,7 @@ Here's a minimal setup example with a broker and one task.
 
 ```python
 import asyncio
-from taskiq_nats import NatsBroker
+from taskiq_nats import NatsBroker, JetStreamBroker
 
 broker = NatsBroker(
     [
@@ -24,6 +25,17 @@ broker = NatsBroker(
         "nats://nats2:4222",
     ],
     queue="random_queue_name",
+)
+
+# Or alternatively you can use a JetStream broker:
+broker = JetStreamBroker(
+    [
+        "nats://nats1:4222",
+        "nats://nats2:4222",
+    ],
+    queue="random_queue_name",
+    subject="my-subj",
+    stream_name="my-stream"
 )
 
 

@@ -6,17 +6,7 @@ import pytest
 from taskiq import BrokerMessage
 
 from taskiq_nats import NatsBroker
-
-
-async def read_message(broker: NatsBroker) -> bytes:  # type: ignore
-    """
-    Read signle message from the broker's listen method.
-
-    :param broker: current broker.
-    :return: firs message.
-    """
-    async for message in broker.listen():  # noqa: WPS328
-        return message
+from tests.utils import read_message
 
 
 @pytest.mark.anyio
@@ -40,6 +30,8 @@ async def test_success_broadcast(nats_urls: List[str], nats_subject: str) -> Non
     for received_message in await asyncio.wait_for(asyncio.gather(*tasks), timeout=1):
         assert received_message == sent_message.message
 
+    await broker.shutdown()
+
 
 @pytest.mark.anyio
 async def test_success_queued(nats_urls: List[str], nats_subject: str) -> None:
@@ -58,3 +50,4 @@ async def test_success_queued(nats_urls: List[str], nats_subject: str) -> None:
     )
     asyncio.create_task(broker.kick(sent_message))
     assert await asyncio.wait_for(reading_task, timeout=1) == sent_message.message
+    await broker.shutdown()
