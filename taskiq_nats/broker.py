@@ -30,7 +30,7 @@ class NatsBroker(AsyncBroker):
     def __init__(  # noqa: WPS211 (too many args)
         self,
         servers: Union[str, List[str]],
-        subject: str = "tasiq_tasks",
+        subject: str = "taskiq_tasks",
         queue: Optional[str] = None,
         result_backend: "Optional[AsyncResultBackend[_T]]" = None,
         task_id_generator: Optional[Callable[[], str]] = None,
