@@ -1,4 +1,5 @@
 import os
+import uuid
 from typing import List
 
 import pytest
@@ -22,7 +23,7 @@ def nats_subject() -> str:
 
     :return: random string.
     """
-    return "12345"
+    return uuid.uuid4().hex
 
 
 @pytest.fixture

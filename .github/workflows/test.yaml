@@ -1,6 +1,6 @@
 name: Testing taskiq-redis
 
-on: push
+on: pull_request
 
 jobs:
   black:
