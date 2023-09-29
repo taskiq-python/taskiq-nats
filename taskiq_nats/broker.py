@@ -4,7 +4,7 @@ from typing import Any, AsyncGenerator, Callable, List, Optional, TypeVar, Union
 from nats.aio.client import Client
 from nats.js import JetStreamContext
 from nats.js.api import StreamConfig
-from taskiq import AsyncBroker, AsyncResultBackend, BrokerMessage
+from taskiq import AckableMessage, AsyncBroker, AsyncResultBackend, BrokerMessage
 
 _T = TypeVar("_T")  # noqa: WPS111 (Too short)
 
@@ -140,7 +140,7 @@ class JetStreamBroker(AsyncBroker):  # noqa: WPS230
             headers=message.labels,
         )
 
-    async def listen(self) -> AsyncGenerator[bytes, None]:
+    async def listen(self) -> AsyncGenerator[AckableMessage, None]:
         """
         Start listen to new messages.
 
@@ -148,8 +148,10 @@ class JetStreamBroker(AsyncBroker):  # noqa: WPS230
         """
         subscribe = await self.js.subscribe(self.subject, queue=self.queue or "")
         async for message in subscribe.messages:
-            yield message.data
-            await message.ack()
+            yield AckableMessage(
+                data=message.data,
+                ack=message.ack,
+            )
 
     async def shutdown(self) -> None:
         """Close connections to NATS."""
