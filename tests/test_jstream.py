@@ -3,7 +3,7 @@ import uuid
 from typing import List
 
 import pytest
-from taskiq import BrokerMessage
+from taskiq import AckableMessage, BrokerMessage
 
 from taskiq_nats import JetStreamBroker
 from tests.utils import read_message
@@ -33,5 +33,10 @@ async def test_success(nats_urls: List[str], nats_subject: str) -> None:
         labels={},
     )
     await broker.kick(sent_message)
-    assert await asyncio.wait_for(read_message(broker), 0.5) == sent_message.message
+    ackable_msg = await asyncio.wait_for(read_message(broker), 0.5)
+    assert isinstance(ackable_msg, AckableMessage)
+    assert ackable_msg.data == sent_message.message
+    ack = ackable_msg.ack()
+    if ack is not None:
+        await ack
     await broker.shutdown()
