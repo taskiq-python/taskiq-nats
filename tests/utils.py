@@ -9,5 +9,5 @@ async def read_message(broker: AsyncBroker) -> bytes:  # type: ignore
     :return: firs message.
     """
     async for message in broker.listen():
-        assert isinstance(message, bytes)
+        assert isinstance(message, bytes)  # noqa: S101
         return message
