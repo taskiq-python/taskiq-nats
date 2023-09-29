@@ -41,13 +41,15 @@ repos:
         language: system
         pass_filenames: false
         types: [python]
-        args: [--count, taskiq_nats]
+        args: [--count, taskiq_nats, tests]
 
       - id: mypy
         name: Validate types with MyPy
         entry: poetry run mypy
         language: system
+        pass_filenames: false
         types: [python]
+        args: [taskiq_nats, tests]
 
       - id: yesqa
         name: Remove usless noqa
