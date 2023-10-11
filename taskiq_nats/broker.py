@@ -106,7 +106,7 @@ class BaseJetStreamBroker(  # noqa: WPS230 (too many attrs)
     """
 
     def __init__(  # noqa: WPS211 (too many args)
-        self: typing.Self,
+        self,
         servers: typing.Union[str, typing.List[str]],
         subject: str = "taskiq_tasks",
         stream_name: str = "taskiq_jetstream",
@@ -175,7 +175,7 @@ class BaseJetStreamBroker(  # noqa: WPS230 (too many attrs)
         )
 
     @abstractmethod
-    async def _startup_consumer(self: typing.Self) -> None:
+    async def _startup_consumer(self) -> None:
         """Create consumer."""
 
 
@@ -200,7 +200,7 @@ class PushBasedJetStreamBroker(
                 ack=message.ack,
             )
 
-    async def _startup_consumer(self: typing.Self) -> None:
+    async def _startup_consumer(self) -> None:
         if not self.consumer_config:
             self.consumer_config = ConsumerConfig(
                 name=self.default_consumer_name,
@@ -243,7 +243,7 @@ class PullBasedJetStreamBroker(
             except NatsTimeoutError:
                 continue
 
-    async def _startup_consumer(self: typing.Self) -> None:
+    async def _startup_consumer(self) -> None:
         if not self.consumer_config:
             self.consumer_config = ConsumerConfig(
                 durable_name=self.durable,
