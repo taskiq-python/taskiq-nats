@@ -1,6 +1,9 @@
 import os
 import uuid
-from typing import List
+from typing import AsyncGenerator, Final, List
+
+from nats.js import JetStreamContext
+from nats import NATS
 
 import pytest
 
@@ -38,3 +41,18 @@ def nats_urls() -> List[str]:
     """
     urls = os.environ.get("NATS_URLS") or "nats://localhost:4222"
     return urls.split(",")
+
+
+@pytest.fixture()
+async def nats_jetstream(nats_urls: List[str]) -> AsyncGenerator[JetStreamContext, None]:
+    """Create and yield nats client and jetstream instances.
+    
+    :param nats_urls: urls to nats.
+
+    :yields: NATS JetStream.
+    """
+    nats: Final = NATS()
+    await nats.connect(servers=nats_urls)
+    jetstream: Final = nats.jetstream()
+    yield jetstream
+    await nats.close()
