@@ -5,12 +5,12 @@ from typing import List
 import pytest
 from taskiq import AckableMessage, BrokerMessage
 
-from taskiq_nats import PushBasedJetStreamBroker, PullBasedJetStreamBroker
+from taskiq_nats import PullBasedJetStreamBroker, PushBasedJetStreamBroker
 from tests.utils import read_message
 
 
 @pytest.mark.anyio
-async def test_push_based_broker_success(
+async def test_push_based_broker_success(  # noqa: WPS217 (too many await)
     nats_urls: List[str],
     nats_subject: str,
 ) -> None:
@@ -53,7 +53,7 @@ async def test_push_based_broker_success(
 
 
 @pytest.mark.anyio()
-async def test_pull_based_broker_success(
+async def test_pull_based_broker_success(  # noqa: WPS217 (too many await)
     nats_urls: List[str],
     nats_subject: str,
 ) -> None:

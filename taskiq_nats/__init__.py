@@ -6,9 +6,9 @@ uses NATS as a message queue.
 """
 
 from taskiq_nats.broker import (
-    PushBasedJetStreamBroker,
-    PullBasedJetStreamBroker,
     NatsBroker,
+    PullBasedJetStreamBroker,
+    PushBasedJetStreamBroker,
 )
 
 __all__ = [

@@ -2,10 +2,9 @@ import os
 import uuid
 from typing import AsyncGenerator, Final, List
 
-from nats.js import JetStreamContext
-from nats import NATS
-
 import pytest
+from nats import NATS
+from nats.js import JetStreamContext
 
 
 @pytest.fixture(scope="session")
@@ -44,9 +43,11 @@ def nats_urls() -> List[str]:
 
 
 @pytest.fixture()
-async def nats_jetstream(nats_urls: List[str]) -> AsyncGenerator[JetStreamContext, None]:
+async def nats_jetstream(
+    nats_urls: List[str],  # noqa: WPS442
+) -> AsyncGenerator[JetStreamContext, None]:
     """Create and yield nats client and jetstream instances.
-    
+
     :param nats_urls: urls to nats.
 
     :yields: NATS JetStream.
