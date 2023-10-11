@@ -41,7 +41,7 @@ class NatsBroker(AsyncBroker):
         subject: str = "taskiq_tasks",
         queue: typing.Optional[str] = None,
         result_backend: "typing.Optional[AsyncResultBackend[_T]]" = None,
-        task_id_generator: typing.Optional[typing.Callable[[], str],] = None,
+        task_id_generator: typing.Optional[typing.Callable[[], str]] = None,
         **connection_kwargs: typing.Any,
     ) -> None:
         super().__init__(result_backend, task_id_generator)
@@ -112,7 +112,7 @@ class BaseJetStreamBroker(  # noqa: WPS230 (too many attrs)
         stream_name: str = "taskiq_jetstream",
         queue: typing.Optional[str] = None,
         durable: str = "taskiq_durable",
-        result_backend: "typing.Optional[AsyncResultBackend[_T]]" = None,
+        result_backend: typing.Optional[AsyncResultBackend[_T]] = None,
         task_id_generator: typing.Optional[typing.Callable[[], str]] = None,
         stream_config: typing.Optional[StreamConfig] = None,
         consumer_config: typing.Optional[ConsumerConfig] = None,

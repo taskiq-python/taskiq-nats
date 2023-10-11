@@ -85,7 +85,7 @@ async def test_pull_based_broker_success(  # noqa: WPS217 (too many await)
         await ack
     await broker.js.delete_consumer(
         stream=broker.stream_name,
-        consumer=broker.default_consumer_name,
+        consumer=broker.durable,
     )
     await broker.js.delete_stream(
         broker.stream_name,
