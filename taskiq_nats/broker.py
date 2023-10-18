@@ -112,15 +112,13 @@ class BaseJetStreamBroker(  # noqa: WPS230 (too many attrs)
         stream_name: str = "taskiq_jetstream",
         queue: typing.Optional[str] = None,
         durable: str = "taskiq_durable",
-        result_backend: typing.Optional[AsyncResultBackend[_T]] = None,
-        task_id_generator: typing.Optional[typing.Callable[[], str]] = None,
         stream_config: typing.Optional[StreamConfig] = None,
         consumer_config: typing.Optional[ConsumerConfig] = None,
         pull_consume_batch: int = 1,
         pull_consume_timeout: typing.Optional[float] = None,
         **connection_kwargs: typing.Any,
     ) -> None:
-        super().__init__(result_backend, task_id_generator)
+        super().__init__()
         self.servers: typing.Final = servers
         self.client: typing.Final = Client()
         self.connection_kwargs: typing.Final = connection_kwargs
