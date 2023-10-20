@@ -1,4 +1,4 @@
-name: Testing taskiq-redis
+name: Testing taskiq-nats
 
 on: pull_request
 
