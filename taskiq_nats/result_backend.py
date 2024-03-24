@@ -1,5 +1,5 @@
 import pickle
-from typing import Any, Final, List, TypeVar
+from typing import Any, Final, List, TypeVar, Union
 
 import nats
 from nats import NATS
@@ -19,7 +19,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
 
     def __init__(
         self,
-        servers: str | List[str],
+        servers: Union[str, List[str]],
         keep_results: bool = True,
         bucket_name: str = "taskiq_results",
         **connect_options: Any,
