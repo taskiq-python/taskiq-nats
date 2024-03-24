@@ -1,4 +1,3 @@
-import asyncio
 import uuid
 from typing import Any, TypeVar
 
@@ -6,7 +5,6 @@ import pytest
 from taskiq import TaskiqResult
 
 from taskiq_nats import NATSObjectStoreResultBackend
-
 
 _ReturnType = TypeVar("_ReturnType")
 
@@ -61,9 +59,9 @@ def custom_taskiq_result() -> TaskiqResult[Any]:
 
 @pytest.mark.anyio
 async def test_success_backend_default_result(
-    nats_result_backend: NATSObjectStoreResultBackend,
+    nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
+    default_taskiq_result: TaskiqResult[_ReturnType],
     task_id: str,
-    nats_urls: list[str],
 ) -> None:
     """
     Tests normal behavior with default result in TaskiqResult.
@@ -83,10 +81,9 @@ async def test_success_backend_default_result(
 
 @pytest.mark.anyio
 async def test_success_backend_custom_result(
-    nats_result_backend: NATSObjectStoreResultBackend,
+    nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
     custom_taskiq_result: TaskiqResult[_ReturnType],
     task_id: str,
-    nats_urls: list[str],
 ) -> None:
     """
     Tests normal behavior with custom result in TaskiqResult.

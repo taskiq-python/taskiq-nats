@@ -10,7 +10,7 @@ from tests.utils import read_message
 
 
 @pytest.mark.anyio
-async def test_push_based_broker_success(  # noqa: WPS217 (too many await)
+async def test_push_based_broker_success(  # (too many await)
     nats_urls: List[str],
     nats_subject: str,
 ) -> None:
@@ -53,7 +53,7 @@ async def test_push_based_broker_success(  # noqa: WPS217 (too many await)
 
 
 @pytest.mark.anyio()
-async def test_pull_based_broker_success(  # noqa: WPS217 (too many await)
+async def test_pull_based_broker_success(  # (too many await)
     nats_urls: List[str],
     nats_subject: str,
 ) -> None:

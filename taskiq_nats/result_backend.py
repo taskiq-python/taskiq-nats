@@ -1,18 +1,15 @@
 import pickle
-from typing import Any, Coroutine, Dict, Final, Optional, TypeVar, Union
+from typing import Any, Final, TypeVar
 
 import nats
-from taskiq import AsyncResultBackend
-from taskiq.abc.result_backend import TaskiqResult
-
 from nats import NATS
 from nats.js import JetStreamContext
-from nats.js.object_store import ObjectStore
 from nats.js.errors import BucketNotFoundError, ObjectNotFoundError
+from nats.js.object_store import ObjectStore
+from taskiq import AsyncResultBackend
 from taskiq.result import TaskiqResult
 
 from taskiq_nats.exceptions import ResultIsMissingError
-
 
 _ReturnType = TypeVar("_ReturnType")
 
@@ -28,7 +25,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
         **connect_options: Any,
     ) -> None:
         """Construct new result backend.
-        
+
         :param servers: NATS servers .
         :param keep_results: flag to not remove results from Redis after reading.
         :param connect_kwargs: additional arguments for nats `connect()` method.
@@ -41,10 +38,10 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
         self.nats_client: NATS
         self.nats_jetstream: JetStreamContext
         self.object_store: ObjectStore
-    
+
     async def startup(self) -> None:
         """Create new connection to NATS.
-        
+
         Initialize JetStream context and new ObjectStore instance.
         """
         self.nats_client = await nats.connect(
@@ -56,22 +53,30 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
         try:
             self.object_store = await self.nats_jetstream.object_store(self.bucket_name)
         except BucketNotFoundError:
-            self.object_store = await self.nats_jetstream.create_object_store(self.bucket_name)
-    
+            self.object_store = await self.nats_jetstream.create_object_store(
+                self.bucket_name,
+            )
+
     async def shutdown(self) -> None:
+        """Close nats connection."""
         if self.nats_client.is_closed:
             return
         await self.nats_client.close()
 
     async def set_result(self, task_id: str, result: TaskiqResult[_ReturnType]) -> None:
+        """Set result to the nats bucket.
+
+        :param task_id: ID of the task.
+        :param result: result of the task.
+        """
         await self.object_store.put(
             name=task_id,
             data=pickle.dumps(result),
         )
-    
+
     async def is_result_ready(self, task_id: str) -> bool:
         """Returns whether the result is ready.
-        
+
         :param task_id: ID of the task.
 
         :returns: True if the result is ready else False.
@@ -106,12 +111,12 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
             await self.object_store.delete(
                 name=task_id,
             )
-        
+
         taskiq_result: TaskiqResult[_ReturnType] = pickle.loads(  # noqa: S301
-            result.data,
+            result.data,  # type: ignore[arg-type]
         )
 
         if not with_logs:
             taskiq_result.log = None
-        
+
         return taskiq_result

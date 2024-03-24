@@ -48,7 +48,7 @@ def nats_urls() -> List[str]:
 
 @pytest.fixture()
 async def nats_jetstream(
-    nats_urls: List[str],  # noqa: WPS442
+    nats_urls: List[str],
 ) -> AsyncGenerator[JetStreamContext, None]:
     """Create and yield nats client and jetstream instances.
 
@@ -66,7 +66,7 @@ async def nats_jetstream(
 @pytest.fixture()
 async def nats_result_backend(
     nats_urls: List[str],
-) -> AsyncGenerator[NATSObjectStoreResultBackend, None]:
+) -> AsyncGenerator[NATSObjectStoreResultBackend[_ReturnType], None]:
     backend: NATSObjectStoreResultBackend[_ReturnType] = NATSObjectStoreResultBackend(
         servers=nats_urls,
     )
