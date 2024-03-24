@@ -1,12 +1,14 @@
 import uuid
-from typing import Any, TypeVar
+from typing import Any, List, TypeVar
 
 import pytest
 from taskiq import TaskiqResult
 
 from taskiq_nats import NATSObjectStoreResultBackend
+from taskiq_nats.exceptions import ResultIsMissingError
 
 _ReturnType = TypeVar("_ReturnType")
+pytestmark = pytest.mark.anyio
 
 
 class ResultForTest:
@@ -57,7 +59,38 @@ def custom_taskiq_result() -> TaskiqResult[Any]:
     )
 
 
-@pytest.mark.anyio
+async def test_failure_backend_result(
+    nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
+    task_id: str,
+) -> None:
+    """Test exception raising in `get_result` method."""
+    with pytest.raises(expected_exception=ResultIsMissingError):
+        await nats_result_backend.get_result(task_id=task_id)
+
+
+async def test_success_backend_default_result_delete_res(
+    nats_urls: List[str],
+    default_taskiq_result: TaskiqResult[_ReturnType],
+    task_id: str,
+) -> None:
+    backend: NATSObjectStoreResultBackend[_ReturnType] = NATSObjectStoreResultBackend(
+        servers=nats_urls,
+        keep_results=False,
+    )
+    await backend.startup()
+
+    await backend.set_result(
+        task_id=task_id,
+        result=default_taskiq_result,
+    )
+    await backend.get_result(task_id=task_id)
+
+    with pytest.raises(expected_exception=ResultIsMissingError):
+        await backend.get_result(task_id=task_id)
+
+    await backend.shutdown()
+
+
 async def test_success_backend_default_result(
     nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
     default_taskiq_result: TaskiqResult[_ReturnType],
@@ -79,7 +112,6 @@ async def test_success_backend_default_result(
     assert result == default_taskiq_result
 
 
-@pytest.mark.anyio
 async def test_success_backend_custom_result(
     nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
     custom_taskiq_result: TaskiqResult[_ReturnType],
@@ -105,3 +137,18 @@ async def test_success_backend_custom_result(
     assert result.is_err == custom_taskiq_result.is_err
     assert result.execution_time == custom_taskiq_result.execution_time
     assert result.log == custom_taskiq_result.log
+
+
+async def test_success_backend_is_result_ready(
+    nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
+    custom_taskiq_result: TaskiqResult[_ReturnType],
+    task_id: str,
+) -> None:
+    """Tests `is_result_ready` method."""
+    assert not await nats_result_backend.is_result_ready(task_id=task_id)
+    await nats_result_backend.set_result(
+        task_id=task_id,
+        result=custom_taskiq_result,
+    )
+
+    assert await nats_result_backend.is_result_ready(task_id=task_id)
