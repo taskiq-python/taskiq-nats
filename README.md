@@ -119,3 +119,40 @@ Here's the constructor parameters:
 * `durable` - durable name of the consumer. It's used to share messages between different consumers.
 * `pull_consume_batch` - maximum number of message that can be fetched each time.
 * `pull_consume_timeout` - timeout for messages fetch. If there is no messages, we start fetching messages again.
+
+
+## NATS Result Backend
+It's possible to use NATS JetStream to store tasks result.
+```python
+import asyncio
+from taskiq_nats import PullBasedJetStreamBroker
+from taskiq_nats.result_backend import NATSObjectStoreResultBackend
+
+
+result_backend = NATSObjectStoreResultBackend(
+    servers="localhost",
+)
+broker = PullBasedJetStreamBroker(
+    servers="localhost",
+).with_result_backend(
+    result_backend=result_backend,
+)
+
+
+@broker.task
+async def awesome_task() -> str:
+    return "Hello, NATS!"
+
+
+async def main() -> None:
+    await broker.startup()
+    task = await awesome_task.kiq()
+    res = await task.wait_result()
+    print(res)
+    await broker.shutdown()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+```

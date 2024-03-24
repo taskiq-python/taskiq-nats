@@ -1,10 +1,14 @@
 import os
 import uuid
-from typing import AsyncGenerator, Final, List
+from typing import AsyncGenerator, Final, List, TypeVar
 
 import pytest
 from nats import NATS
 from nats.js import JetStreamContext
+
+from taskiq_nats import NATSObjectStoreResultBackend
+
+_ReturnType = TypeVar("_ReturnType")
 
 
 @pytest.fixture(scope="session")
@@ -57,3 +61,15 @@ async def nats_jetstream(
     jetstream: Final = nats.jetstream()
     yield jetstream
     await nats.close()
+
+
+@pytest.fixture()
+async def nats_result_backend(
+    nats_urls: List[str],
+) -> AsyncGenerator[NATSObjectStoreResultBackend, None]:
+    backend: NATSObjectStoreResultBackend[_ReturnType] = NATSObjectStoreResultBackend(
+        servers=nats_urls,
+    )
+    await backend.startup()
+    yield backend
+    await backend.shutdown()
