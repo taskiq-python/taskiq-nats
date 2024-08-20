@@ -42,6 +42,7 @@ strict = true
 ignore_missing_imports = true
 allow_subclassing_any = true
 allow_untyped_calls = true
+packages = ["taskiq_nats"]
 pretty = true
 show_error_codes = true
 implicit_reexport = true

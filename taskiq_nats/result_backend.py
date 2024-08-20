@@ -113,7 +113,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
             )
 
         taskiq_result: TaskiqResult[_ReturnType] = pickle.loads(  # noqa: S301
-            result.data,  # type: ignore[arg-type]
+            result.data,
         )
 
         if not with_logs:
