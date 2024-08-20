@@ -1,5 +1,4 @@
-import pickle
-from typing import Any, Final, List, TypeVar, Union
+from typing import Any, Final, List, Optional, TypeVar, Union
 
 import nats
 from nats import NATS
@@ -7,7 +6,10 @@ from nats.js import JetStreamContext
 from nats.js.errors import BucketNotFoundError, ObjectNotFoundError
 from nats.js.object_store import ObjectStore
 from taskiq import AsyncResultBackend
+from taskiq.abc.serializer import TaskiqSerializer
+from taskiq.compat import model_dump, model_validate
 from taskiq.result import TaskiqResult
+from taskiq.serializers import PickleSerializer
 
 from taskiq_nats.exceptions import ResultIsMissingError
 
@@ -22,6 +24,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
         servers: Union[str, List[str]],
         keep_results: bool = True,
         bucket_name: str = "taskiq_results",
+        serializer: Optional[TaskiqSerializer] = None,
         **connect_options: Any,
     ) -> None:
         """Construct new result backend.
@@ -33,6 +36,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
         self.servers: Final = servers
         self.keep_results: Final = keep_results
         self.bucket_name: Final = bucket_name
+        self.serializer = serializer or PickleSerializer()
         self.connect_options: Final = connect_options
 
         self.nats_client: NATS
@@ -71,7 +75,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
         """
         await self.object_store.put(
             name=task_id,
-            data=pickle.dumps(result),
+            data=self.serializer.dumpb(model_dump(result)),
         )
 
     async def is_result_ready(self, task_id: str) -> bool:
@@ -112,8 +116,9 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
                 name=task_id,
             )
 
-        taskiq_result: TaskiqResult[_ReturnType] = pickle.loads(  # noqa: S301
-            result.data,
+        taskiq_result: TaskiqResult[_ReturnType] = model_validate(
+            TaskiqResult[_ReturnType],  # type: ignore[misc]
+            self.serializer.loadb(result.data),
         )
 
         if not with_logs:
