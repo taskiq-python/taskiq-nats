@@ -22,19 +22,19 @@ repos:
     language: system
     types: [ python ]
 
-  - id: ruff
-    name: Run ruff lints
-    entry: poetry run ruff
-    language: system
-    pass_filenames: false
-    types: [ python ]
-    args:
-    - "--fix"
-    - "taskiq_nats"
-    - "tests"
-
   - id: mypy
     name: Validate types with MyPy
     entry: poetry run mypy
     language: system
     types: [ python ]
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.6.0
+  hooks:
+  - id: ruff
+    name: ruff-check
+    pass_filenames: false
+    args:
+    - --fix
+    - taskiq_nats
+    - tests
