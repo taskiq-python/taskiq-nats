@@ -22,12 +22,6 @@ repos:
     language: system
     types: [ python ]
 
-  - id: mypy
-    name: Validate types with MyPy
-    entry: poetry run mypy
-    language: system
-    types: [ python ]
-
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.6.0
   hooks:
@@ -38,3 +32,9 @@ repos:
     - --fix
     - taskiq_nats
     - tests
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.11.1
+  hooks:
+  - id: mypy
+    pass_filenames: false

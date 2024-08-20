@@ -27,7 +27,6 @@ taskiq = ">=0.8,<1"
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 pre-commit = "^2.20.0"
-mypy = "^1.1.1"
 flake8 = "^6"
 autoflake = "^1.4"
 yesqa = "^1.4.0"
