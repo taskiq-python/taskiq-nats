@@ -5,13 +5,11 @@ from nats import NATS
 from nats.js import JetStreamContext
 from nats.js.errors import BucketNotFoundError, ObjectNotFoundError
 from nats.js.object_store import ObjectStore
-from taskiq import AsyncResultBackend
+from taskiq import AsyncResultBackend, ResultGetError
 from taskiq.abc.serializer import TaskiqSerializer
 from taskiq.compat import model_dump, model_validate
 from taskiq.result import TaskiqResult
 from taskiq.serializers import PickleSerializer
-
-from taskiq_nats.exceptions import ResultIsMissingError
 
 _ReturnType = TypeVar("_ReturnType")
 
@@ -109,7 +107,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
                 name=task_id,
             )
         except ObjectNotFoundError as exc:
-            raise ResultIsMissingError from exc
+            raise ResultGetError from exc
 
         if not self.keep_results:
             await self.object_store.delete(

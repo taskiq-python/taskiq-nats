@@ -2,10 +2,9 @@ import uuid
 from typing import Any, List, TypeVar
 
 import pytest
-from taskiq import TaskiqResult
+from taskiq import ResultGetError, TaskiqResult
 
 from taskiq_nats import NATSObjectStoreResultBackend
-from taskiq_nats.exceptions import ResultIsMissingError
 
 _ReturnType = TypeVar("_ReturnType")
 pytestmark = pytest.mark.anyio
@@ -64,7 +63,7 @@ async def test_failure_backend_result(
     task_id: str,
 ) -> None:
     """Test exception raising in `get_result` method."""
-    with pytest.raises(expected_exception=ResultIsMissingError):
+    with pytest.raises(expected_exception=ResultGetError):
         await nats_result_backend.get_result(task_id=task_id)
 
 
@@ -85,7 +84,7 @@ async def test_success_backend_default_result_delete_res(
     )
     await backend.get_result(task_id=task_id)
 
-    with pytest.raises(expected_exception=ResultIsMissingError):
+    with pytest.raises(expected_exception=ResultGetError):
         await backend.get_result(task_id=task_id)
 
     await backend.shutdown()
