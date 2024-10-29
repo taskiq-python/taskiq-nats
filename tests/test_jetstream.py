@@ -53,7 +53,7 @@ async def test_push_based_broker_success(  # (too many await)
 
 
 @pytest.mark.anyio()
-async def test_pull_based_broker_success(  # (too many await)
+async def test_pull_based_broker_success(
     nats_urls: List[str],
     nats_subject: str,
 ) -> None:

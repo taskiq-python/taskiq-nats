@@ -35,7 +35,7 @@ class NatsBroker(AsyncBroker):
     https://docs.nats.io/nats-concepts/core-nats/queue
     """
 
-    def __init__(  # (too many args)
+    def __init__(
         self,
         servers: typing.Union[str, typing.List[str]],
         subject: str = "taskiq_tasks",
@@ -88,7 +88,7 @@ class NatsBroker(AsyncBroker):
         await super().shutdown()
 
 
-class BaseJetStreamBroker(  # (too many attrs)
+class BaseJetStreamBroker(
     AsyncBroker,
     ABC,
     typing.Generic[JetStreamConsumerType],
@@ -105,7 +105,7 @@ class BaseJetStreamBroker(  # (too many attrs)
     be sure that messages are delivered to the workers.
     """
 
-    def __init__(  # (too many args)
+    def __init__(
         self,
         servers: typing.Union[str, typing.List[str]],
         subject: str = "taskiq_tasks",
