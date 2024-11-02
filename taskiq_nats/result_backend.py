@@ -115,8 +115,8 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
             )
 
         taskiq_result: TaskiqResult[_ReturnType] = model_validate(
-            TaskiqResult[_ReturnType],
-            self.serializer.loadb(result.data),  # type: ignore[arg-type]
+            TaskiqResult[_ReturnType],  # type: ignore[misc]
+            self.serializer.loadb(result.data),
         )
 
         if not with_logs:
