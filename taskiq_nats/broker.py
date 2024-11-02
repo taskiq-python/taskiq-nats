@@ -9,7 +9,7 @@ from nats.js import JetStreamContext
 from nats.js.api import ConsumerConfig, StreamConfig
 from taskiq import AckableMessage, AsyncBroker, AsyncResultBackend, BrokerMessage
 
-_T = typing.TypeVar("_T")  # noqa: WPS111 (Too short)
+_T = typing.TypeVar("_T")  # (Too short)
 
 
 JetStreamConsumerType = typing.TypeVar(
@@ -35,7 +35,7 @@ class NatsBroker(AsyncBroker):
     https://docs.nats.io/nats-concepts/core-nats/queue
     """
 
-    def __init__(  # noqa: WPS211 (too many args)
+    def __init__(
         self,
         servers: typing.Union[str, typing.List[str]],
         subject: str = "taskiq_tasks",
@@ -88,7 +88,7 @@ class NatsBroker(AsyncBroker):
         await super().shutdown()
 
 
-class BaseJetStreamBroker(  # noqa: WPS230 (too many attrs)
+class BaseJetStreamBroker(
     AsyncBroker,
     ABC,
     typing.Generic[JetStreamConsumerType],
@@ -105,7 +105,7 @@ class BaseJetStreamBroker(  # noqa: WPS230 (too many attrs)
     be sure that messages are delivered to the workers.
     """
 
-    def __init__(  # noqa: WPS211 (too many args)
+    def __init__(
         self,
         servers: typing.Union[str, typing.List[str]],
         subject: str = "taskiq_tasks",
@@ -227,7 +227,7 @@ class PullBasedJetStreamBroker(
 
         :yield: incoming messages.
         """
-        while True:  # noqa: WPS327
+        while True:
             try:
                 nats_messages: typing.List[NatsMessage] = await self.consumer.fetch(
                     batch=self.pull_consume_batch,

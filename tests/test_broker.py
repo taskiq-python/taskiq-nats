@@ -25,7 +25,7 @@ async def test_success_broadcast(nats_urls: List[str], nats_subject: str) -> Non
         labels={},
     )
 
-    asyncio.create_task(broker.kick(sent_message))
+    asyncio.create_task(broker.kick(sent_message))  # noqa: RUF006
 
     for received_message in await asyncio.wait_for(asyncio.gather(*tasks), timeout=1):
         assert received_message == sent_message.message
@@ -48,6 +48,6 @@ async def test_success_queued(nats_urls: List[str], nats_subject: str) -> None:
         message=b"some",
         labels={},
     )
-    asyncio.create_task(broker.kick(sent_message))
+    asyncio.create_task(broker.kick(sent_message))  # noqa: RUF006
     assert await asyncio.wait_for(reading_task, timeout=1) == sent_message.message
     await broker.shutdown()

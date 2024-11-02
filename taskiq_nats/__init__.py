@@ -10,9 +10,11 @@ from taskiq_nats.broker import (
     PullBasedJetStreamBroker,
     PushBasedJetStreamBroker,
 )
+from taskiq_nats.result_backend import NATSObjectStoreResultBackend
 
 __all__ = [
     "NatsBroker",
     "PushBasedJetStreamBroker",
     "PullBasedJetStreamBroker",
+    "NATSObjectStoreResultBackend",
 ]
