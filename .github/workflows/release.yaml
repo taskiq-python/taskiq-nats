@@ -1,9 +1,9 @@
 name: Release python package
 
 on:
-  push:
-    tags:
-      - "*"
+  release:
+    types:
+      - released
 
 jobs:
   deploy:
