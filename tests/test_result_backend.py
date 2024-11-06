@@ -111,43 +111,39 @@ async def test_success_backend_default_result(
     assert result == default_taskiq_result
 
 
-async def test_success_backend_custom_result(
+async def test_error_backend_custom_result(
     nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
     custom_taskiq_result: TaskiqResult[_ReturnType],
     task_id: str,
 ) -> None:
     """
-    Tests normal behavior with custom result in TaskiqResult.
+    Tests that error is thrown on non-serializable result.
 
     :param custom_taskiq_result: TaskiqResult with custom result.
     :param task_id: ID for task.
     :param redis_url: url to redis.
     """
-    await nats_result_backend.set_result(
-        task_id=task_id,
-        result=custom_taskiq_result,
-    )
-    result = await nats_result_backend.get_result(task_id=task_id)
-
-    assert (
-        result.return_value.test_arg  # type: ignore
-        == custom_taskiq_result.return_value.test_arg  # type: ignore
-    )
-    assert result.is_err == custom_taskiq_result.is_err
-    assert result.execution_time == custom_taskiq_result.execution_time
-    assert result.log == custom_taskiq_result.log
+    with pytest.raises(ValueError):
+        await nats_result_backend.set_result(
+            task_id=task_id,
+            result=custom_taskiq_result,
+        )
 
 
 async def test_success_backend_is_result_ready(
     nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
-    custom_taskiq_result: TaskiqResult[_ReturnType],
     task_id: str,
 ) -> None:
     """Tests `is_result_ready` method."""
     assert not await nats_result_backend.is_result_ready(task_id=task_id)
     await nats_result_backend.set_result(
         task_id=task_id,
-        result=custom_taskiq_result,
+        result=TaskiqResult(
+            is_err=False,
+            log=None,
+            return_value="one",
+            execution_time=1,
+        ),
     )
 
     assert await nats_result_backend.is_result_ready(task_id=task_id)

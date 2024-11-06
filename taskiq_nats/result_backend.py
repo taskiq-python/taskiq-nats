@@ -1,7 +1,7 @@
 from typing import Any, Final, List, Optional, TypeVar, Union
 
 import nats
-from nats import NATS
+from nats.aio.client import Client
 from nats.js import JetStreamContext
 from nats.js.errors import BucketNotFoundError, ObjectNotFoundError
 from nats.js.object_store import ObjectStore
@@ -37,7 +37,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
         self.serializer = serializer or PickleSerializer()
         self.connect_options: Final = connect_options
 
-        self.nats_client: NATS
+        self.nats_client: Client
         self.nats_jetstream: JetStreamContext
         self.object_store: ObjectStore
 
