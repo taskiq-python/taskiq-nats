@@ -28,7 +28,8 @@ jobs:
     strategy:
       matrix:
         py_version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-    runs-on: "ubuntu-latest"
+        platform: ["windows-latest", "ubuntu-latest"]
+    runs-on: "${{ matrix.platform }}"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
