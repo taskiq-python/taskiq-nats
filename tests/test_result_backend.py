@@ -3,6 +3,7 @@ from typing import Any, TypeVar
 
 import pytest
 from taskiq import ResultGetError, TaskiqResult
+from taskiq.depends.progress_tracker import TaskProgress
 
 from taskiq_nats import NATSObjectStoreResultBackend
 
@@ -146,3 +147,23 @@ async def test_success_backend_is_result_ready(
     )
 
     assert await nats_result_backend.is_result_ready(task_id=task_id)
+
+
+async def test_set_and_get_progress(
+    nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
+    task_id: str,
+) -> None:
+    progress = TaskProgress(state="PROGRESS", meta={"current": 5, "total": 10})
+    await nats_result_backend.set_progress(task_id=task_id, progress=progress)
+    result = await nats_result_backend.get_progress(task_id=task_id)
+    assert result is not None
+    assert result.state == "PROGRESS"
+    assert result.meta == {"current": 5, "total": 10}
+
+
+async def test_get_progress_not_found(
+    nats_result_backend: NATSObjectStoreResultBackend[_ReturnType],
+    task_id: str,
+) -> None:
+    result = await nats_result_backend.get_progress(task_id=task_id)
+    assert result is None
