@@ -196,6 +196,7 @@ class PushBasedJetStreamBroker(
             yield AckableMessage(
                 data=message.data,
                 ack=message.ack,
+                ack_progress=message.in_progress,
             )
 
     async def _startup_consumer(self) -> None:
@@ -237,6 +238,7 @@ class PullBasedJetStreamBroker(
                     yield AckableMessage(
                         data=nats_message.data,
                         ack=nats_message.ack,
+                        ack_progress=nats_message.in_progress,
                     )
             except NatsTimeoutError:
                 continue
