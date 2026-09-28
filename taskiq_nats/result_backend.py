@@ -7,7 +7,6 @@ from nats.js.errors import BucketNotFoundError, ObjectNotFoundError
 from nats.js.object_store import ObjectStore
 from taskiq import AsyncResultBackend, ResultGetError
 from taskiq.abc.serializer import TaskiqSerializer
-from taskiq.compat import model_dump, model_validate
 from taskiq.result import TaskiqResult
 from taskiq.serializers import PickleSerializer
 
@@ -73,7 +72,7 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
         """
         await self.object_store.put(
             name=task_id,
-            data=self.serializer.dumpb(model_dump(result)),
+            data=self.serializer.dumpb(result.model_dump(mode="json")),
         )
 
     async def is_result_ready(self, task_id: str) -> bool:
@@ -114,8 +113,9 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
                 name=task_id,
             )
 
-        taskiq_result: TaskiqResult[_ReturnType] = model_validate(
-            TaskiqResult[_ReturnType],
+        taskiq_result: TaskiqResult[_ReturnType] = TaskiqResult[
+            _ReturnType
+        ].model_validate(
             self.serializer.loadb(result.data),  # type: ignore[arg-type]
         )
 

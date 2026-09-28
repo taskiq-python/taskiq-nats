@@ -8,7 +8,6 @@ from nats.js.errors import BucketNotFoundError, NoKeysError
 from nats.js.kv import KeyValue
 from taskiq import ScheduledTask, ScheduleSource
 from taskiq.abc.serializer import TaskiqSerializer
-from taskiq.compat import model_dump, model_validate
 from taskiq.serializers import PickleSerializer
 
 log = logging.getLogger(__name__)
@@ -85,7 +84,7 @@ class NATSKeyValueScheduleSource(ScheduleSource):
         """
         await self.kv.put(
             f"{self.prefix}.{schedule.schedule_id}",
-            self.serializer.dumpb(model_dump(schedule)),
+            self.serializer.dumpb(schedule.model_dump(mode="json")),
         )
 
     async def get_schedules(self) -> list[ScheduledTask]:
@@ -102,7 +101,7 @@ class NATSKeyValueScheduleSource(ScheduleSource):
             return []
 
         return [
-            model_validate(ScheduledTask, self.serializer.loadb(schedule.value))
+            ScheduledTask.model_validate(self.serializer.loadb(schedule.value))
             for schedule in schedules
             if schedule and schedule.value
         ]
