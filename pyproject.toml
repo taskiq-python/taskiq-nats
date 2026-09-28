@@ -29,7 +29,7 @@ repository = "https://github.com/taskiq-python/taskiq-nats"
 keywords = ["taskiq", "tasks", "distributed", "async", "nats", "result_backend"]
 requires-python = ">=3.10,<4"
 dependencies = [
-    "taskiq>=0.11.20,<1",
+    "taskiq>=0.13.0",
     "nats-py>=2.2.0",
 ]
 
