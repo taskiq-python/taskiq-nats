@@ -105,7 +105,7 @@ class BaseJetStreamBroker(
     be sure that messages are delivered to the workers.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0917
         self,
         servers: str | list[str],
         subject: str = "taskiq_tasks",

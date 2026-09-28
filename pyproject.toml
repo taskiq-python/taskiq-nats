@@ -37,10 +37,10 @@ dependencies = [
 dev = [
     "pre-commit>=4.4.0",
     # lint
-    "ruff>=0.14.5",
-    "black>=25.11.0",
+    "ruff>=0.16.9",
+    "black>=26.5.1",
     # type check
-    "mypy>=1.18.2",
+    "mypy>=2.3.1",
     # tests
     "pytest>=9.0.1",
     "pytest-cov>=7.0.0",
