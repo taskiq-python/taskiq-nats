@@ -7,6 +7,7 @@ from nats.js.errors import BucketNotFoundError, ObjectNotFoundError
 from nats.js.object_store import ObjectStore
 from taskiq import AsyncResultBackend, ResultGetError
 from taskiq.abc.serializer import TaskiqSerializer
+from taskiq.depends.progress_tracker import TaskProgress
 from taskiq.result import TaskiqResult
 from taskiq.serializers import PickleSerializer
 
@@ -123,3 +124,33 @@ class NATSObjectStoreResultBackend(AsyncResultBackend[_ReturnType]):
             taskiq_result.log = None
 
         return taskiq_result
+
+    async def set_progress(
+        self,
+        task_id: str,
+        progress: TaskProgress[Any],
+    ) -> None:
+        """Set progress of the task to the nats bucket.
+
+        :param task_id: ID of the task.
+        :param progress: progress of the task.
+        """
+        await self.object_store.put(
+            name=f"progress:{task_id}",
+            data=self.serializer.dumpb(progress.model_dump(mode="json")),
+        )
+
+    async def get_progress(self, task_id: str) -> TaskProgress[Any] | None:
+        """Retrieve progress of the task from the nats bucket.
+
+        :param task_id: ID of the task.
+
+        :return: progress of the task or None if it is not set.
+        """
+        try:
+            result = await self.object_store.get(name=f"progress:{task_id}")
+        except ObjectNotFoundError:
+            return None
+        return TaskProgress[Any].model_validate(
+            self.serializer.loadb(result.data),  # type: ignore[arg-type]
+        )
