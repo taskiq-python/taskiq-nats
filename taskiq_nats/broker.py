@@ -7,6 +7,7 @@ from nats.aio.msg import Msg as NatsMessage
 from nats.errors import TimeoutError as NatsTimeoutError
 from nats.js import JetStreamContext
 from nats.js.api import ConsumerConfig, StreamConfig
+from nats.js.errors import BadRequestError
 from taskiq import AckableMessage, AsyncBroker, AsyncResultBackend, BrokerMessage
 
 _T = typing.TypeVar("_T")  # (Too short)
@@ -152,8 +153,21 @@ class BaseJetStreamBroker(
             self.stream_config.name = self.stream_name
         if not self.stream_config.subjects:
             self.stream_config.subjects = [self.subject]
-        await self.js.add_stream(config=self.stream_config)
+        await self._add_or_reuse_stream()
         await self._startup_consumer()
+
+    async def _add_or_reuse_stream(self) -> None:
+        """Create a stream or reuse an already existing one."""
+        try:
+            await self.js.add_stream(config=self.stream_config)
+        except BadRequestError as exc:
+            if exc.err_code != 10058:
+                raise
+            logger.info(
+                "Stream %s already exists with a different configuration. "
+                "Reusing the existing stream.",
+                self.stream_config.name,
+            )
 
     async def shutdown(self) -> None:
         """Close connections to NATS."""
