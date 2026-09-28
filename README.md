@@ -93,6 +93,30 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+### JetStream acknowledgement progress
+
+JetStream brokers expose acknowledgement progress for long-running tasks. Call it
+before the consumer's acknowledgement timeout expires to tell JetStream that the
+message is still being processed.
+
+```python
+from taskiq import Context, TaskiqDepends
+
+
+@broker.task(ack_type="manual")
+async def long_running_task(
+    context: Context = TaskiqDepends(),
+) -> None:
+    while still_working:
+        await do_some_work()
+        await context.ack_progress()
+
+    await context.ack()
+```
+
+`ack_progress()` can be called repeatedly. It does not finally acknowledge the
+message; call `ack()` when processing has completed successfully.
+
 ## NatsBroker configuration
 
 Here's the constructor parameters:

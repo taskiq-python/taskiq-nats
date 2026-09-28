@@ -1,10 +1,52 @@
 import asyncio
 import uuid
+from collections.abc import AsyncGenerator
+from unittest.mock import AsyncMock, MagicMock
 
 from taskiq import AckableMessage, BrokerMessage
 
 from taskiq_nats import PullBasedJetStreamBroker, PushBasedJetStreamBroker
 from tests.utils import read_message
+
+
+async def test_push_based_broker_exposes_ack_progress(
+    nats_urls: list[str],
+) -> None:
+    nats_message = MagicMock()
+    nats_message.data = b"message"
+    nats_message.ack = AsyncMock()
+    nats_message.in_progress = AsyncMock()
+
+    async def message_stream() -> AsyncGenerator[MagicMock, None]:
+        yield nats_message
+
+    broker = PushBasedJetStreamBroker(servers=nats_urls)
+    broker.consumer = MagicMock(messages=message_stream())
+
+    message = await anext(broker.listen())
+
+    assert message.ack_progress is not None
+    await message.ack_progress()
+    nats_message.in_progress.assert_awaited_once_with()
+
+
+async def test_pull_based_broker_exposes_ack_progress(
+    nats_urls: list[str],
+) -> None:
+    nats_message = MagicMock()
+    nats_message.data = b"message"
+    nats_message.ack = AsyncMock()
+    nats_message.in_progress = AsyncMock()
+
+    broker = PullBasedJetStreamBroker(servers=nats_urls)
+    broker.consumer = MagicMock()
+    broker.consumer.fetch = AsyncMock(return_value=[nats_message])
+
+    message = await anext(broker.listen())
+
+    assert message.ack_progress is not None
+    await message.ack_progress()
+    nats_message.in_progress.assert_awaited_once_with()
 
 
 async def test_push_based_broker_success(  # (too many await)
@@ -36,6 +78,8 @@ async def test_push_based_broker_success(  # (too many await)
     ackable_msg = await asyncio.wait_for(read_message(broker), 0.5)
     assert isinstance(ackable_msg, AckableMessage)
     assert ackable_msg.data == sent_message.message
+    assert ackable_msg.ack_progress is not None
+    await ackable_msg.ack_progress()
     ack = ackable_msg.ack()
     if ack is not None:
         await ack
@@ -76,6 +120,8 @@ async def test_pull_based_broker_success(
     ackable_msg = await asyncio.wait_for(read_message(broker), 0.5)
     assert isinstance(ackable_msg, AckableMessage)
     assert ackable_msg.data == sent_message.message
+    assert ackable_msg.ack_progress is not None
+    await ackable_msg.ack_progress()
     ack = ackable_msg.ack()
     if ack is not None:
         await ack
