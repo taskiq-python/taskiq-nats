@@ -17,11 +17,11 @@ jobs:
         cmd: ["black", "ruff", "mypy"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - id: setup-uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
           cache-suffix: 3.11
@@ -34,14 +34,14 @@ jobs:
   pytest:
     strategy:
       matrix:
-        py_version: ["3.10", "3.11", "3.12", "3.13"]
+        py_version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - id: setup-uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
           cache-suffix: ${{ matrix.py_version }}
@@ -50,7 +50,7 @@ jobs:
       - name: Install deps
         run: uv sync --all-extras
       - name: Update docker-compose
-        uses: KengoTODA/actions-setup-docker-compose@v1
+        uses: KengoTODA/actions-setup-docker-compose@caf887cb5173b7ea66cce3c7db3b1e04974a53d4 # v1.2.8
         with:
           version: "2.16.0"
       - name: docker compose up
@@ -60,7 +60,7 @@ jobs:
       - name: Generate report
         run: uv run coverage xml
       - name: Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
         if: matrix.py_version == '3.10'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
