@@ -103,9 +103,22 @@ class NATSKeyValueScheduleSource(ScheduleSource):
         result = []
         for schedule in schedules:
             if schedule and schedule.value:
-                task = ScheduledTask.model_validate(
-                    self.serializer.loadb(schedule.value),
-                )
+                try:
+                    task = ScheduledTask.model_validate(
+                        self.serializer.loadb(schedule.value),
+                    )
+                except Exception:
+                    # A multi-token key may belong to a source with a nested
+                    # prefix and a different serializer, so it must not break
+                    # this snapshot. Single-token keys can only be ours.
+                    if "." not in schedule.key[len(self.prefix) + 1 :]:
+                        raise
+                    log.warning(
+                        "Skipping undecodable schedule %r: it may belong to "
+                        "a source with a nested prefix.",
+                        schedule.key,
+                    )
+                    continue
                 # A nested prefix can match the wildcard without belonging to us.
                 if schedule.key == f"{self.prefix}.{task.schedule_id}":
                     result.append(task)
