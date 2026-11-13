@@ -96,15 +96,20 @@ class NATSKeyValueScheduleSource(ScheduleSource):
         :return: list of schedules.
         """
         try:
-            schedules = await self.kv.history(f"{self.prefix}.*")
+            schedules = await self.kv.history(f"{self.prefix}.>")
         except NoKeysError:
             return []
 
-        return [
-            ScheduledTask.model_validate(self.serializer.loadb(schedule.value))
-            for schedule in schedules
-            if schedule and schedule.value
-        ]
+        result = []
+        for schedule in schedules:
+            if schedule and schedule.value:
+                task = ScheduledTask.model_validate(
+                    self.serializer.loadb(schedule.value),
+                )
+                # A nested prefix can match the wildcard without belonging to us.
+                if schedule.key == f"{self.prefix}.{task.schedule_id}":
+                    result.append(task)
+        return result
 
     async def post_send(self, task: ScheduledTask) -> None:
         """Delete a task after it's completed."""
