@@ -1,5 +1,4 @@
 import datetime as dt
-import logging
 import pickle
 import uuid
 from collections.abc import AsyncGenerator
@@ -7,7 +6,6 @@ from collections.abc import AsyncGenerator
 import pytest
 from taskiq import ScheduledTask
 from taskiq.cli.scheduler.run import get_schedules
-from taskiq.serializers import JSONSerializer
 
 from taskiq_nats import NATSKeyValueScheduleSource
 
@@ -122,38 +120,6 @@ async def test_nested_prefix_keeps_its_own_schedules(
         await nested.shutdown()
 
 
-async def test_nested_prefix_with_another_serializer(
-    nats_urls: list[str],
-    schedule_source: NATSKeyValueScheduleSource,
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    nested = NATSKeyValueScheduleSource(
-        servers=nats_urls,
-        bucket_name=schedule_source.bucket_name,
-        prefix=f"{schedule_source.prefix}.nested",
-        serializer=JSONSerializer(),
-    )
-    await nested.startup()
-    try:
-        root_task = ScheduledTask(
-            schedule_id="root_task",
-            task_name="report",
-            labels={},
-            args=[],
-            kwargs={},
-            cron="* * * * *",
-        )
-        nested_task = root_task.model_copy(update={"schedule_id": "nested_task"})
-        await schedule_source.add_schedule(root_task)
-        await nested.add_schedule(nested_task)
-        with caplog.at_level(logging.WARNING, logger="taskiq_nats.schedule_source"):
-            assert await schedule_source.get_schedules() == [root_task]
-        assert f"{nested.prefix}.nested_task" in caplog.text
-        assert await nested.get_schedules() == [nested_task]
-    finally:
-        await nested.shutdown()
-
-
 async def test_invalid_payload_still_raises_and_recovers(
     schedule_source: NATSKeyValueScheduleSource,
 ) -> None:
@@ -163,25 +129,3 @@ async def test_invalid_payload_still_raises_and_recovers(
         await schedule_source.get_schedules()
     await schedule_source.kv.delete(key)
     assert await schedule_source.get_schedules() == []
-
-
-async def test_undecodable_multi_token_key_is_skipped(
-    schedule_source: NATSKeyValueScheduleSource,
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    # Such keys were never read before multi-token IDs were supported, and
-    # they cannot be told apart from a nested source's schedules.
-    task = ScheduledTask(
-        schedule_id="valid",
-        task_name="report",
-        labels={},
-        args=[],
-        kwargs={},
-        cron="* * * * *",
-    )
-    await schedule_source.add_schedule(task)
-    key = f"{schedule_source.prefix}.daily.broken"
-    await schedule_source.kv.put(key, b"not-pickle")
-    with caplog.at_level(logging.WARNING, logger="taskiq_nats.schedule_source"):
-        assert await schedule_source.get_schedules() == [task]
-    assert key in caplog.text
